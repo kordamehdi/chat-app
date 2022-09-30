@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+  chat-app-back:
+    build:
+      context: ../
+    container_name: chat-app
+    ports:
+      - "8081:8081"
+    depends_on:
+      - slackDB
+    networks:
+      - chat-app-Network
+  slackDB:
+    container_name: slackDB
+    image: postgres
+    ports:
+      - "5431:5432"
+    volumes:
+      - slack-volumes:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: root
+      POSTGRES_USER: root
+      POSTGRES_DB: slackDB
+    networks:
+      - chat-app-Network
+
+  redis:
+    image: redis:6.0.8
+    container_name: redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    networks:
+      - chat-app-Network
+
+volumes:
+  slack-volumes:
+networks:
+  chat-app-Network:
